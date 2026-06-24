@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { lockPin } from '../lib/pinAuth';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/layout/PageHeader';
 import { BAND_LABELS, getDestination } from '../data/flightBands';
@@ -44,6 +45,23 @@ export function SettingsPage() {
     <>
       <PageHeader title="Settings" />
       <div className="flex-1 space-y-6 overflow-y-auto p-6">
+        <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Security</h2>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            PIN is required when you open the app. Lock now to require it again.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              lockPin();
+              window.location.reload();
+            }}
+            className="mt-4 flex min-h-12 w-full items-center justify-center rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-300"
+          >
+            Lock app
+          </button>
+        </section>
+
         <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-700 dark:bg-gray-800">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-gray-500">Appearance</h2>
           <label className="mt-4 flex min-h-12 cursor-pointer items-center justify-between rounded-xl bg-gray-50 px-4 dark:bg-gray-900">

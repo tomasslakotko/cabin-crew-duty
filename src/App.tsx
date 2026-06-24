@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { PinLockScreen } from './components/auth/PinLockScreen';
 import { AppShell } from './components/layout/AppShell';
 import { CateringPage } from './pages/CateringPage';
 import { OrdersPage } from './pages/OrdersPage';
@@ -7,6 +8,7 @@ import { SeatMapPage } from './pages/SeatMapPage';
 import { SummaryPage } from './pages/SummaryPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { StockingPage } from './pages/StockingPage';
+import { isPinUnlocked } from './lib/pinAuth';
 
 import { useFlightStore } from './stores/flightStore';
 
@@ -24,10 +26,15 @@ function LoadingScreen() {
 export default function App() {
   const initFlight = useFlightStore((s) => s.initFlight);
   const initialized = useFlightStore((s) => s.initialized);
+  const [unlocked, setUnlocked] = useState(isPinUnlocked);
 
   useEffect(() => {
     void initFlight();
   }, [initFlight]);
+
+  if (!unlocked) {
+    return <PinLockScreen onUnlock={() => setUnlocked(true)} />;
+  }
 
   if (!initialized) {
     return <LoadingScreen />;
