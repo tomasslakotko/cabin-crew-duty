@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { db } from '../db/schema';
+import { localCateringRepository } from '../db/repositories/localCateringRepository';
 import { localOrderRepository, localStockRepository } from '../db/repositories';
 import type { FlightSession, MealStock } from '../types';
 import { getBandForDestination } from '../data/flightBands';
@@ -25,6 +26,7 @@ interface FlightState {
   setDestination: (destination: string) => Promise<void>;
   clearDestination: () => Promise<void>;
   resetFlight: () => Promise<void>;
+  closeDay: () => Promise<void>;
 }
 
 function normalizeFlight(raw: FlightSession): FlightSession {
@@ -62,8 +64,23 @@ function persistActiveFlightId(id: string) {
   localStorage.setItem(ACTIVE_FLIGHT_KEY, id);
 }
 
+function clearActiveFlightId() {
+  localStorage.removeItem(ACTIVE_FLIGHT_KEY);
+}
+
 function readActiveFlightId(): string | null {
   return localStorage.getItem(ACTIVE_FLIGHT_KEY);
+}
+
+async function wipeAllFlightsAndData(): Promise<void> {
+  const flights = await db.flights.toArray();
+  for (const f of flights) {
+    await localOrderRepository.deleteAllForFlight(f.id);
+    await localCateringRepository.deleteAllForFlight(f.id);
+    await db.mealStocks.where('flightId').equals(f.id).delete();
+  }
+  await db.flights.clear();
+  clearActiveFlightId();
 }
 
 async function pickActiveFlight(flights: FlightSession[]): Promise<FlightSession | null> {
@@ -186,5 +203,10 @@ export const useFlightStore = create<FlightState>((set, get) => ({
       flight: updated,
       flights: get().flights.map((f) => (f.id === updated.id ? updated : f)),
     });
+  },
+
+  closeDay: async () => {
+    await wipeAllFlightsAndData();
+    set({ flights: [], flight: null, initialized: false });
   },
 }));

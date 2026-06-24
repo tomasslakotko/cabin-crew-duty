@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { lockPin } from '../lib/pinAuth';
+import { closeDayAndLock } from '../lib/closeDay';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/layout/PageHeader';
 import { BAND_LABELS, getDestination } from '../data/flightBands';
@@ -22,7 +23,19 @@ export function SettingsPage() {
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
   const [syncEnabled, setSyncEnabled] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [confirmCloseDay, setConfirmCloseDay] = useState(false);
+  const [closingDay, setClosingDay] = useState(false);
   const [resetting, setResetting] = useState(false);
+
+  async function handleCloseDay() {
+    setClosingDay(true);
+    try {
+      await closeDayAndLock();
+    } catch {
+      setClosingDay(false);
+      setConfirmCloseDay(false);
+    }
+  }
 
   const handleReset = async () => {
     if (!flight) return;
@@ -204,6 +217,49 @@ export function SettingsPage() {
               className="h-5 w-5 rounded"
             />
           </label>
+        </section>
+
+        <section className="rounded-2xl border-2 border-red-300 bg-red-50/50 p-5 shadow-sm dark:border-red-800 dark:bg-red-950/30">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-red-700 dark:text-red-400">
+            Close the day
+          </h2>
+          <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
+            Deletes all flights, orders, checklists, and meal counts for today. You will return to the
+            PIN screen and start with a fresh flight.
+          </p>
+          {!confirmCloseDay ? (
+            <button
+              type="button"
+              onClick={() => setConfirmCloseDay(true)}
+              className="mt-4 min-h-12 w-full rounded-xl bg-red-600 text-sm font-semibold text-white active:bg-red-700"
+            >
+              Close the day
+            </button>
+          ) : (
+            <div className="mt-4 flex flex-col gap-3">
+              <p className="text-sm font-medium text-red-800 dark:text-red-300">
+                This cannot be undone. Close the day?
+              </p>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => void handleCloseDay()}
+                  disabled={closingDay}
+                  className="min-h-12 flex-1 rounded-xl bg-red-600 text-sm font-semibold text-white disabled:opacity-50"
+                >
+                  {closingDay ? 'Closing…' : 'Yes, close day'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmCloseDay(false)}
+                  disabled={closingDay}
+                  className="min-h-12 rounded-xl border border-gray-200 px-4 text-sm font-medium text-gray-600 dark:border-gray-600 dark:text-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="rounded-2xl border border-red-200 bg-white p-5 shadow-sm dark:border-red-900 dark:bg-gray-800">
