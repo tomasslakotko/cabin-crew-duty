@@ -10,12 +10,12 @@ interface BobDutyGuideProps {
 
 export function BobDutyGuide({ duties, phaseLabel }: BobDutyGuideProps) {
   const flight = useFlightStore((s) => s.flight);
-  const isDone = useChecklistStore((s) => s.isDone);
+  const items = useChecklistStore((s) => s.items);
   const toggleItem = useChecklistStore((s) => s.toggleItem);
 
   if (duties.length === 0 || !flight) return null;
 
-  const doneCount = duties.filter((d) => isDone(checklistKeyForBob(d.id))).length;
+  const doneCount = duties.filter((d) => items[checklistKeyForBob(d.id)]).length;
 
   return (
     <GuideCard title={`BOB procedure — ${phaseLabel}`}>
@@ -30,7 +30,7 @@ export function BobDutyGuide({ duties, phaseLabel }: BobDutyGuideProps) {
       <ul className="space-y-2">
         {duties.map((duty) => {
           const key = checklistKeyForBob(duty.id);
-          const done = isDone(key);
+          const done = Boolean(items[key]);
           return (
             <li key={duty.id}>
               <button

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { PinLockScreen } from './components/auth/PinLockScreen';
 import { AppShell } from './components/layout/AppShell';
+import { ChecklistPage } from './pages/ChecklistPage';
 import { CateringPage } from './pages/CateringPage';
 import { OrdersPage } from './pages/OrdersPage';
 import { SeatMapPage } from './pages/SeatMapPage';
@@ -47,6 +48,7 @@ export default function App() {
           <Route index element={<SeatMapPage />} />
           <Route path="orders" element={<OrdersPage />} />
           <Route path="stocking" element={<StockingPage />} />
+          <Route path="checklist" element={<ChecklistPage />} />
           <Route path="catering" element={<CateringPage />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="summary" element={<SummaryPage />} />

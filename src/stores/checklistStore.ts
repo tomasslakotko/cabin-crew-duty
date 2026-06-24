@@ -39,19 +39,31 @@ export const useChecklistStore = create<ChecklistState>((set, get) => ({
   toggleItem: async (flightId, itemKey) => {
     const wasDone = get().items[itemKey] ?? false;
     const completed = !wasDone;
-    const record: ChecklistItemState = {
-      flightId,
-      itemKey,
-      completed,
-      completedAt: completed ? Date.now() : undefined,
-    };
-    await localCateringRepository.saveChecklistItem(record);
+
     set((state) => {
       const next = { ...state.items };
       if (completed) next[itemKey] = true;
       else delete next[itemKey];
       return { items: next };
     });
+
+    const record: ChecklistItemState = {
+      flightId,
+      itemKey,
+      completed,
+      completedAt: completed ? Date.now() : undefined,
+    };
+
+    try {
+      await localCateringRepository.saveChecklistItem(record);
+    } catch {
+      set((state) => {
+        const next = { ...state.items };
+        if (wasDone) next[itemKey] = true;
+        else delete next[itemKey];
+        return { items: next };
+      });
+    }
   },
 
   isDone: (itemKey) => get().items[itemKey] ?? false,

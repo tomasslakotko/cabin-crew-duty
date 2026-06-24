@@ -4,6 +4,7 @@ const navItems = [
   { to: '/', label: 'Seat Map', icon: SeatIcon },
   { to: '/orders', label: 'Orders', icon: OrdersIcon },
   { to: '/stocking', label: 'Stocking', icon: StockIcon },
+  { to: '/checklist', label: 'Checklist', icon: ChecklistIcon },
   { to: '/catering', label: 'Guide', icon: CateringIcon },
   { to: '/settings', label: 'Settings', icon: SettingsIcon },
 ];
@@ -58,6 +59,15 @@ function StockIcon({ className }: { className?: string }) {
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M4 7h16l-1.5 12H5.5L4 7z" />
       <path d="M9 7V5a3 3 0 016 0v2" />
+    </svg>
+  );
+}
+
+function ChecklistIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M9 11l3 3L22 4" />
+      <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
     </svg>
   );
 }

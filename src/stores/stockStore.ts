@@ -8,6 +8,7 @@ interface StockState {
   loading: boolean;
   loadStocks: (flightId: string) => Promise<void>;
   updateStock: (stock: MealStock) => Promise<void>;
+  saveAllStocks: (stocks: MealStock[]) => Promise<void>;
   refreshRemaining: (flightId: string) => Promise<void>;
 }
 
@@ -32,6 +33,13 @@ export const useStockStore = create<StockState>((set, get) => ({
     await localStockRepository.saveAll(next);
     set({ stocks: next });
     await get().refreshRemaining(stock.flightId);
+  },
+
+  saveAllStocks: async (stocks) => {
+    if (stocks.length === 0) return;
+    await localStockRepository.saveAll(stocks);
+    set({ stocks });
+    await get().refreshRemaining(stocks[0].flightId);
   },
 
   refreshRemaining: async (flightId) => {

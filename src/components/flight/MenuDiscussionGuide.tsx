@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import type { FlightBand } from '../../data/flightBands';
 import { aperitifGuidance, BAND_LABELS, getDestination } from '../../data/flightBands';
+import { getBandMenus, hasBandMenus } from '../../data/bandMenus';
 import { AperitifServiceGuide } from './AperitifServiceGuide';
+import { BandMenuGuide } from './BandMenuGuide';
 import { GuideCard } from '../catering/GuideCard';
 import { showAperitifServiceGuide } from '../../data/aperitifServiceGuide';
 
@@ -37,6 +39,7 @@ export function MenuDiscussionGuide({
 
   const dest = getDestination(destination);
   const aperitif = aperitifGuidance(band);
+  const bandMenus = getBandMenus(band);
 
   if (collapsible && hidden) {
     return (
@@ -108,6 +111,8 @@ export function MenuDiscussionGuide({
       <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">
         Use product knowledge and make suggestions to showcase what is on board.
       </p>
+
+      {hasBandMenus(band) && <BandMenuGuide sections={bandMenus} />}
 
       {showAperitifServiceGuide(band) && (
         <div className="mt-6 border-t border-gray-100 pt-5 dark:border-gray-700">

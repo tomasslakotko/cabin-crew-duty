@@ -11,11 +11,15 @@ interface InteractiveChecklistProps {
 
 export function InteractiveChecklist({ phase, steps, forms }: InteractiveChecklistProps) {
   const flight = useFlightStore((s) => s.flight);
-  const isDone = useChecklistStore((s) => s.isDone);
+  const items = useChecklistStore((s) => s.items);
   const toggleItem = useChecklistStore((s) => s.toggleItem);
-  const progress = useChecklistStore((s) => s.phaseProgress)(phase, steps.length);
 
   if (!flight) return null;
+
+  const progress = {
+    done: steps.filter((_, index) => items[checklistKeyForPhaseStep(phase, index)]).length,
+    total: steps.length,
+  };
 
   const allDone = progress.done === progress.total && progress.total > 0;
 
@@ -46,7 +50,7 @@ export function InteractiveChecklist({ phase, steps, forms }: InteractiveCheckli
       <ul className="space-y-2">
         {steps.map((step, index) => {
           const key = checklistKeyForPhaseStep(phase, index);
-          const done = isDone(key);
+          const done = Boolean(items[key]);
           return (
             <li key={key}>
               <button
