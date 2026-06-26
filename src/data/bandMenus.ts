@@ -213,3 +213,12 @@ export function getStockableMeals(band: FlightBand): StockableMealOption[] {
 export function getBandMenuLabels(band: FlightBand): string[] {
   return getBandMenus(band).map((s) => s.label);
 }
+
+/** Default JC menu label for outbound (OB) or inbound (IB) legs. */
+export function getDefaultMenuLabel(band: FlightBand, inbound: boolean): string | null {
+  const menus = getBandMenus(band);
+  if (menus.length === 0) return null;
+  const suffix = inbound ? ' IB' : ' OB';
+  const match = menus.find((m) => m.label.endsWith(suffix));
+  return match?.label ?? menus[0]?.label ?? null;
+}

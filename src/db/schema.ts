@@ -59,6 +59,25 @@ export class CabinCrewDB extends Dexie {
           if (!f.status) f.status = 'active';
         }),
     );
+    this.version(4).stores({
+      flights: 'id, date, status, createdAt',
+      mealStocks: 'id, flightId, sortOrder',
+      orders: 'id, flightId, seatId, status, mealId, createdAt',
+      sealGroups: 'id, flightId, galley, listType, direction',
+      cateringCarts: 'id, flightId, galley, listType, sortOrder',
+      cateringLineItems: 'id, cartId',
+      cateringSignoffs: 'flightId',
+      bobDutyChecks: 'flightId, dutyId',
+      cateringPhases: 'flightId, phase',
+      checklistItems: '[flightId+itemKey], flightId',
+    }).upgrade((tx) =>
+      tx
+        .table('flights')
+        .toCollection()
+        .modify((f: FlightSession) => {
+          if (f.destination && !f.origin) f.origin = 'BEG';
+        }),
+    );
   }
 }
 

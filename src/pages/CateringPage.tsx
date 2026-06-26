@@ -41,8 +41,12 @@ export function CateringPage() {
       <GalleyTabs active={galley} onChange={setGalley} />
 
       <div className="flex-1 space-y-6 overflow-y-auto p-4 pb-12">
-        {flight?.destination && flight.flightBand && (
-          <MenuDiscussionGuide destination={flight.destination} band={flight.flightBand} />
+        {flight?.origin && flight?.destination && flight.flightBand && (
+          <MenuDiscussionGuide
+            origin={flight.origin}
+            destination={flight.destination}
+            band={flight.flightBand}
+          />
         )}
 
         {flight?.flightBand && showAperitifServiceGuide(flight.flightBand) && (

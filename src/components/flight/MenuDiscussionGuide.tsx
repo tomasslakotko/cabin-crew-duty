@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FlightBand } from '../../data/flightBands';
-import { aperitifGuidance, BAND_LABELS, getDestination } from '../../data/flightBands';
+import { aperitifGuidance, BAND_LABELS, formatRoute, formatRouteCodes } from '../../data/flightBands';
 import { getBandMenus, hasBandMenus } from '../../data/bandMenus';
 import { AperitifServiceGuide } from './AperitifServiceGuide';
 import { BandMenuGuide } from './BandMenuGuide';
@@ -10,12 +10,14 @@ import { showAperitifServiceGuide } from '../../data/aperitifServiceGuide';
 const STORAGE_KEY = 'crew-duty-menu-guide-hidden';
 
 interface MenuDiscussionGuideProps {
+  origin: string;
   destination: string;
   band: FlightBand;
   collapsible?: boolean;
 }
 
 export function MenuDiscussionGuide({
+  origin,
   destination,
   band,
   collapsible = true,
@@ -37,7 +39,8 @@ export function MenuDiscussionGuide({
     setHidden(false);
   }
 
-  const dest = getDestination(destination);
+  const routeLabel = formatRoute(origin, destination);
+  const routeCodes = formatRouteCodes(origin, destination);
   const aperitif = aperitifGuidance(band);
   const bandMenus = getBandMenus(band);
 
@@ -47,7 +50,7 @@ export function MenuDiscussionGuide({
         <p className="text-sm text-gray-600 dark:text-gray-400">
           <span className="font-semibold text-gray-900 dark:text-gray-100">Menu discussion</span>
           <span className="mx-2 text-gray-300">·</span>
-          <span className="font-mono font-bold text-navy dark:text-blue-300">{destination}</span>
+          <span className="font-mono font-bold text-navy dark:text-blue-300">{routeCodes}</span>
           <span className="mx-2 text-gray-300">·</span>
           Band {band}
         </p>
@@ -67,7 +70,7 @@ export function MenuDiscussionGuide({
       title="Menu discussion"
       badge={
         <span className="rounded-lg bg-navy px-2.5 py-1 text-xs font-bold text-white">
-          {destination} · Band {band}
+          {routeCodes} · Band {band}
         </span>
       }
       action={
@@ -84,7 +87,7 @@ export function MenuDiscussionGuide({
     >
       <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
         Complete on the ground <strong>AFT → FWD</strong>. Essential for late-night departures.
-        {dest && ` Flying to ${dest.city} (${BAND_LABELS[band].replace(/^Band \d — /, '')}).`}
+        {` Flying ${routeLabel} (${BAND_LABELS[band].replace(/^Band \d — /, '')}).`}
       </p>
 
       <div className="mb-4 rounded-xl border border-navy/20 bg-navy/5 px-4 py-3 dark:border-blue-400/30 dark:bg-navy/20">

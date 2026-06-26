@@ -3,7 +3,7 @@ import { db } from '../db/schema';
 import { localCateringRepository } from '../db/repositories/localCateringRepository';
 import { localOrderRepository, localStockRepository } from '../db/repositories';
 import type { FlightSession, MealStock } from '../types';
-import { getBandForDestination } from '../data/flightBands';
+import { getRouteBand, isValidRoute } from '../data/flightBands';
 import { generateId } from '../lib/utils';
 
 const ACTIVE_FLIGHT_KEY = 'crew-duty-active-flight-id';
@@ -23,8 +23,8 @@ interface FlightState {
   createFlight: (flightNumber?: string) => Promise<FlightSession>;
   completeFlight: (id: string) => Promise<void>;
   setFlightNumber: (flightNumber: string) => Promise<void>;
-  setDestination: (destination: string) => Promise<void>;
-  clearDestination: () => Promise<void>;
+  setRoute: (origin: string, destination: string) => Promise<void>;
+  clearRoute: () => Promise<void>;
   resetFlight: () => Promise<void>;
   closeDay: () => Promise<void>;
 }
@@ -163,14 +163,21 @@ export const useFlightStore = create<FlightState>((set, get) => ({
     });
   },
 
-  setDestination: async (destination) => {
+  setRoute: async (origin, destination) => {
     const flight = get().flight;
     if (!flight) return;
-    const code = destination.toUpperCase();
-    const band = getBandForDestination(code);
+    const o = origin.toUpperCase();
+    const d = destination.toUpperCase();
+    if (!isValidRoute(o, d)) return;
+    const band = getRouteBand(o, d);
     if (!band) return;
 
-    const updated: FlightSession = { ...flight, destination: code, flightBand: band };
+    const updated: FlightSession = {
+      ...flight,
+      origin: o,
+      destination: d,
+      flightBand: band,
+    };
     await db.flights.put(updated);
     set({
       flight: updated,
@@ -178,10 +185,15 @@ export const useFlightStore = create<FlightState>((set, get) => ({
     });
   },
 
-  clearDestination: async () => {
+  clearRoute: async () => {
     const flight = get().flight;
     if (!flight) return;
-    const updated: FlightSession = { ...flight, destination: undefined, flightBand: undefined };
+    const updated: FlightSession = {
+      ...flight,
+      origin: undefined,
+      destination: undefined,
+      flightBand: undefined,
+    };
     await db.flights.put(updated);
     set({
       flight: updated,
@@ -195,6 +207,7 @@ export const useFlightStore = create<FlightState>((set, get) => ({
     await localOrderRepository.deleteAllForFlight(flight.id);
     const updated: FlightSession = {
       ...flight,
+      origin: undefined,
       destination: undefined,
       flightBand: undefined,
     };

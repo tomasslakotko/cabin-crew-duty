@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { PageHeader } from '../components/layout/PageHeader';
 import { MealStockForm } from '../components/stocking/MealStockForm';
-import { getBandMenuLabels, getStockableMeals, hasBandMenus } from '../data/bandMenus';
-import { BAND_LABELS } from '../data/flightBands';
+import { getBandMenuLabels, getDefaultMenuLabel, getStockableMeals, hasBandMenus } from '../data/bandMenus';
+import { BAND_LABELS, isInboundRoute } from '../data/flightBands';
 import { useFlightStore } from '../stores/flightStore';
 import { useOrderStore } from '../stores/orderStore';
 import { useStockStore } from '../stores/stockStore';
@@ -13,6 +13,13 @@ export function StockingPage() {
   const loadOrders = useOrderStore((s) => s.loadOrders);
   const { stocks, remaining, loadStocks, updateStock, saveAllStocks } = useStockStore();
   const [menuFilter, setMenuFilter] = useState<string>('all');
+
+  useEffect(() => {
+    if (!flight?.origin || !flight?.destination || !flight.flightBand) return;
+    const inbound = isInboundRoute(flight.origin, flight.destination);
+    const defaultLabel = getDefaultMenuLabel(flight.flightBand, inbound);
+    setMenuFilter(defaultLabel ?? 'all');
+  }, [flight?.id, flight?.origin, flight?.destination, flight?.flightBand]);
 
   useEffect(() => {
     if (!flight) return;
@@ -59,7 +66,7 @@ export function StockingPage() {
         <p className="mb-4 text-sm text-gray-600 dark:text-gray-400">
           {showMenuPicker
             ? 'Tap a service below to load its main courses into all 3 meal slots, then set quantities.'
-            : 'Set today\'s three hot meal options and starting quantities. Set destination first to pick from the JC menu.'}
+            : 'Set today\'s three hot meal options and starting quantities. Set route first to pick from the JC menu.'}
         </p>
 
         {showMenuPicker && band && (

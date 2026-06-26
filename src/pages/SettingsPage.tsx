@@ -3,7 +3,9 @@ import { lockPin } from '../lib/pinAuth';
 import { closeDayAndLock } from '../lib/closeDay';
 import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/layout/PageHeader';
-import { BAND_LABELS, getDestination } from '../data/flightBands';
+import { FlightRouteModal } from '../components/flight/FlightRouteModal';
+import { FlightRouteLabel, hasCompleteRoute } from '../components/flight/FlightRouteLabel';
+import { BAND_LABELS, formatRouteCodes } from '../data/flightBands';
 import { useFlightStore } from '../stores/flightStore';
 import { useOrderStore } from '../stores/orderStore';
 import { useStockStore } from '../stores/stockStore';
@@ -12,7 +14,7 @@ import { useThemeStore } from '../stores/themeStore';
 export function SettingsPage() {
   const flight = useFlightStore((s) => s.flight);
   const resetFlight = useFlightStore((s) => s.resetFlight);
-  const clearDestination = useFlightStore((s) => s.clearDestination);
+  const setRoute = useFlightStore((s) => s.setRoute);
   const flights = useFlightStore((s) => s.flights);
   const createFlight = useFlightStore((s) => s.createFlight);
   const switchFlight = useFlightStore((s) => s.switchFlight);
@@ -22,6 +24,7 @@ export function SettingsPage() {
   const theme = useThemeStore((s) => s.theme);
   const toggleTheme = useThemeStore((s) => s.toggleTheme);
   const [syncEnabled, setSyncEnabled] = useState(false);
+  const [showRouteModal, setShowRouteModal] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmCloseDay, setConfirmCloseDay] = useState(false);
   const [closingDay, setClosingDay] = useState(false);
@@ -51,8 +54,6 @@ export function SettingsPage() {
   };
 
   if (!flight) return null;
-
-  const dest = flight.destination ? getDestination(flight.destination) : undefined;
 
   return (
     <>
@@ -107,11 +108,17 @@ export function SettingsPage() {
               <dd className="font-medium text-gray-900 dark:text-gray-100">{flight.date}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-gray-500">Destination</dt>
+              <dt className="text-gray-500">Route</dt>
               <dd className="font-medium text-gray-900 dark:text-gray-100">
-                {flight.destination
-                  ? `${dest?.city ?? flight.destination} (${flight.destination})`
-                  : 'Not set'}
+                {hasCompleteRoute(flight) ? (
+                  <>
+                    <FlightRouteLabel origin={flight.origin} destination={flight.destination} />
+                    {' '}
+                    ({formatRouteCodes(flight.origin, flight.destination)})
+                  </>
+                ) : (
+                  'Not set'
+                )}
               </dd>
             </div>
             {flight.flightBand && (
@@ -123,13 +130,13 @@ export function SettingsPage() {
               </div>
             )}
           </dl>
-          {flight.destination && (
+          {hasCompleteRoute(flight) && (
             <button
               type="button"
-              onClick={() => void clearDestination()}
+              onClick={() => setShowRouteModal(true)}
               className="mt-4 flex min-h-12 w-full items-center justify-center rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 dark:border-gray-600 dark:text-gray-300"
             >
-              Change destination
+              Change route
             </button>
           )}
           <Link
@@ -165,7 +172,9 @@ export function SettingsPage() {
                   <div>
                     <p className="font-semibold text-gray-900 dark:text-gray-100">{leg}</p>
                     <p className="text-xs text-gray-500">
-                      {f.destination ?? 'No destination'}
+                      {hasCompleteRoute(f)
+                        ? formatRouteCodes(f.origin, f.destination)
+                        : 'No route set'}
                       {f.status === 'completed' ? ' · Completed' : ''}
                     </p>
                   </div>
@@ -265,7 +274,7 @@ export function SettingsPage() {
         <section className="rounded-2xl border border-red-200 bg-white p-5 shadow-sm dark:border-red-900 dark:bg-gray-800">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-red-600">Reset flight</h2>
           <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-            Clears all seat orders and destination. Meal names and quantities are kept.
+            Clears all seat orders and route. Meal names and quantities are kept.
           </p>
           {!confirmReset ? (
             <button
@@ -296,6 +305,17 @@ export function SettingsPage() {
           )}
         </section>
       </div>
+      {showRouteModal && hasCompleteRoute(flight) && (
+        <FlightRouteModal
+          initialOrigin={flight.origin}
+          initialDestination={flight.destination}
+          onConfirm={(origin, destination) => {
+            void setRoute(origin, destination);
+            setShowRouteModal(false);
+          }}
+          onDismiss={() => setShowRouteModal(false)}
+        />
+      )}
     </>
   );
 }

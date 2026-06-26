@@ -110,9 +110,13 @@ export function SeatMapPage() {
 
       <div className="flex min-h-0 flex-1 flex-col landscape:flex-row">
         <div className="min-h-0 flex-1 overflow-y-auto p-6 landscape:min-w-0">
-          {flight?.destination && flight.flightBand && (
+          {flight?.origin && flight?.destination && flight.flightBand && (
             <div className="mb-6">
-              <MenuDiscussionGuide destination={flight.destination} band={flight.flightBand} />
+              <MenuDiscussionGuide
+                origin={flight.origin}
+                destination={flight.destination}
+                band={flight.flightBand}
+              />
             </div>
           )}
           <SeatMap

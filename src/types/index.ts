@@ -23,6 +23,8 @@ export interface FlightSession {
   /** e.g. JU 501 — shown in flight switcher */
   flightNumber?: string;
   status: 'active' | 'completed';
+  /** IATA origin (e.g. BEG); required with destination for a complete route */
+  origin?: string;
   destination?: string;
   flightBand?: 1 | 2 | 3;
   createdAt: number;

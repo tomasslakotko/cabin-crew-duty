@@ -78,7 +78,7 @@ export const DRINK_MENU: DrinkCategory[] = [
     label: 'HOT BEVERAGES',
     items: [
       { id: 'coffee', name: 'Instant coffee', modifiers: ['sugar', 'milk'] },
-      { id: 'tea', name: 'Tea', variants: ['Mint', 'Green', 'Black', 'Fruit'], modifiers: ['lemon', 'sugar', 'milk'] },
+      { id: 'tea', name: 'Tea', variants: ['Mint', 'Green', 'Black', 'Apple cinnamon'], modifiers: ['lemon', 'sugar', 'milk'] },
     ],
   },
 ];

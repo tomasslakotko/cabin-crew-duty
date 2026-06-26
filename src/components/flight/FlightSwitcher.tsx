@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getDestination } from '../../data/flightBands';
+import { FlightRouteLabel, hasCompleteRoute } from './FlightRouteLabel';
 import { useFlightStore } from '../../stores/flightStore';
 
 export function FlightSwitcher() {
@@ -16,7 +16,6 @@ export function FlightSwitcher() {
   const label =
     flight.flightNumber ||
     `Leg ${flights.length - flights.findIndex((f) => f.id === flight.id)}`;
-  const dest = flight.destination ? getDestination(flight.destination) : null;
 
   async function handleCreate() {
     await createFlight(newNumber || undefined);
@@ -32,9 +31,13 @@ export function FlightSwitcher() {
         className="flex min-h-10 items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-1.5 text-left dark:border-gray-600 dark:bg-gray-800"
       >
         <span className="text-sm font-bold text-navy dark:text-blue-300">{label}</span>
-        {dest && (
+        {hasCompleteRoute(flight) && (
           <span className="hidden text-xs text-gray-500 sm:inline">
-            → {dest.city}
+            <FlightRouteLabel
+              origin={flight.origin}
+              destination={flight.destination}
+              codes
+            />
           </span>
         )}
         {flight.status === 'completed' && (
@@ -55,7 +58,6 @@ export function FlightSwitcher() {
             <ul className="max-h-48 space-y-1 overflow-y-auto">
               {flights.map((f, i) => {
                 const fLabel = f.flightNumber || `Leg ${flights.length - i}`;
-                const fDest = f.destination ? getDestination(f.destination) : null;
                 const active = f.id === flight.id;
                 return (
                   <li key={f.id} className="flex gap-1">
@@ -72,9 +74,9 @@ export function FlightSwitcher() {
                       }`}
                     >
                       <span>{fLabel}</span>
-                      {fDest && (
+                      {hasCompleteRoute(f) && (
                         <span className={`ml-1 text-xs ${active ? 'text-white/80' : 'text-gray-400'}`}>
-                          → {f.destination}
+                          <FlightRouteLabel origin={f.origin} destination={f.destination} codes />
                         </span>
                       )}
                       {f.status === 'completed' && !active && (
