@@ -9,9 +9,9 @@ import { generateId } from '../lib/utils';
 const ACTIVE_FLIGHT_KEY = 'crew-duty-active-flight-id';
 
 const DEFAULT_MEALS = [
-  { name: 'Chicken Breast', quantity: 12 },
-  { name: 'Beef Tenderloin', quantity: 10 },
-  { name: 'Vegetarian Pasta', quantity: 8 },
+  { name: 'Chicken Breast', quantity: 0 },
+  { name: 'Beef Tenderloin', quantity: 0 },
+  { name: 'Vegetarian Pasta', quantity: 0 },
 ];
 
 interface FlightState {

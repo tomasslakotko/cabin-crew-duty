@@ -69,7 +69,8 @@ export function SeatSheet({
       order.mealId ||
       order.drinks.length > 0 ||
       order.aperitifDrinks.length > 0 ||
-      order.passengerName.trim();
+      order.passengerName.trim() ||
+      order.notes.trim();
     if (!hasContent) {
       onClose();
       return;
@@ -195,9 +196,20 @@ export function SeatSheet({
           </ul>
         )}
 
+        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+          Comment
+        </label>
+        <textarea
+          value={order.notes}
+          onChange={(e) => setOrder((prev) => ({ ...prev, notes: e.target.value }))}
+          placeholder="Allergies, preferences, special request…"
+          rows={2}
+          className="mb-6 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-base outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+        />
+
         <button
           type="button"
-          disabled={order.drinks.length === 0}
+          disabled={order.drinks.length === 0 && !order.notes.trim()}
           onClick={handleSave}
           className="w-full min-h-[52px] rounded-2xl bg-navy text-base font-semibold text-white active:bg-navy-light disabled:opacity-40"
         >
@@ -301,13 +313,13 @@ export function SeatSheet({
       )}
 
       <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
-        Notes
+        Comment
       </label>
       <textarea
         value={order.notes}
         onChange={(e) => setOrder((prev) => ({ ...prev, notes: e.target.value }))}
-        placeholder="Allergies, preferences..."
-        rows={2}
+        placeholder="Allergies, preferences, special request…"
+        rows={3}
         className="mb-6 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-base outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
       />
 

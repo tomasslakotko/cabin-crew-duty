@@ -178,10 +178,12 @@ export function OrderBoard({ orders, onStatusChange, onServeItem, onServeAll }: 
               />
             </div>
 
-            {selected.notes && (
-              <div className="mt-4 rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-700 dark:bg-gray-800">
-                <p className="text-xs font-medium text-gray-500">Notes</p>
-                <p className="mt-1 text-sm text-gray-700 dark:text-gray-300">{selected.notes}</p>
+            {selected.notes.trim() && (
+              <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-800 dark:bg-amber-900/20">
+                <p className="text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
+                  Comment
+                </p>
+                <p className="mt-1 text-sm text-gray-800 dark:text-gray-200">{selected.notes.trim()}</p>
               </div>
             )}
 

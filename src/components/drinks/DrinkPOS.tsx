@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DRINK_MENU, getDrinkModifiers } from '../../data/drinkMenu';
+import { DRINK_PRESETS, type DrinkPreset } from '../../data/drinkPresets';
 import { getDrinkInfo } from '../../data/drinkInfo';
 import type { DrinkLine, DrinkModifiers } from '../../types';
 import { drinkLineKey } from '../../lib/drinkFormat';
@@ -13,6 +14,8 @@ interface DrinkPOSProps {
   onAdd: (drinks: DrinkLine[]) => void;
   onClose: () => void;
 }
+
+const QUICK_SERVE_ID = 'quick-serve';
 
 type PickerStep =
   | { type: 'menu' }
@@ -38,12 +41,21 @@ function mergeDrinks(
   return [...existing, line];
 }
 
+function applyPresetDrinks(existing: DrinkLine[], preset: DrinkPreset): DrinkLine[] {
+  let next = existing;
+  for (const drink of preset.drinks) {
+    next = mergeDrinks(next, drink.name, drink.variant, drink.modifiers);
+  }
+  return next;
+}
+
 export function DrinkPOS({ initialDrinks, onAdd, onClose }: DrinkPOSProps) {
-  const [categoryId, setCategoryId] = useState(DRINK_MENU[0].id);
+  const [categoryId, setCategoryId] = useState(QUICK_SERVE_ID);
   const [step, setStep] = useState<PickerStep>({ type: 'menu' });
   const [cart, setCart] = useState<DrinkLine[]>(initialDrinks);
   const [preview, setPreview] = useState<PreviewTarget>(null);
 
+  const isQuickServe = categoryId === QUICK_SERVE_ID;
   const category = DRINK_MENU.find((c) => c.id === categoryId) ?? DRINK_MENU[0];
 
   function proceedToModifiers(name: string, variant?: string) {
@@ -61,6 +73,19 @@ export function DrinkPOS({ initialDrinks, onAdd, onClose }: DrinkPOSProps) {
       setStep({ type: 'variant', name, variants });
     } else {
       proceedToModifiers(name);
+    }
+  };
+
+  const handlePresetTap = (preset: DrinkPreset) => {
+    setCart((prev) => applyPresetDrinks(prev, preset));
+    if (preset.followUp) {
+      setStep({
+        type: 'variant',
+        name: preset.followUp.name,
+        variants: preset.followUp.variants,
+      });
+    } else {
+      setStep({ type: 'menu' });
     }
   };
 
@@ -88,6 +113,20 @@ export function DrinkPOS({ initialDrinks, onAdd, onClose }: DrinkPOSProps) {
 
       <div className="flex min-h-0 flex-1">
         <nav className="flex w-44 shrink-0 flex-col gap-1 overflow-y-auto border-r border-gray-200 bg-gray-50 p-3 sm:w-52 dark:border-gray-700 dark:bg-gray-800">
+          <button
+            type="button"
+            onClick={() => {
+              setCategoryId(QUICK_SERVE_ID);
+              setStep({ type: 'menu' });
+            }}
+            className={`min-h-12 rounded-xl px-3 py-2 text-left text-xs font-bold leading-tight tracking-wide sm:text-sm ${
+              isQuickServe
+                ? 'bg-amber-500 text-white'
+                : 'text-amber-700 hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-gray-700'
+            }`}
+          >
+            QUICK SERVE
+          </button>
           {DRINK_MENU.map((cat) => (
             <button
               key={cat.id}
@@ -123,6 +162,18 @@ export function DrinkPOS({ initialDrinks, onAdd, onClose }: DrinkPOSProps) {
                     const item = category.items.find((i) => i.name === step.name);
                     if (item?.variants) {
                       setStep({ type: 'variant', name: step.name, variants: item.variants });
+                      return;
+                    }
+                    // Follow-up from a quick-serve preset (e.g. Tea)
+                    const presetFollowUp = DRINK_PRESETS.find(
+                      (p) => p.followUp?.name === step.name,
+                    )?.followUp;
+                    if (presetFollowUp) {
+                      setStep({
+                        type: 'variant',
+                        name: presetFollowUp.name,
+                        variants: presetFollowUp.variants,
+                      });
                       return;
                     }
                   }
@@ -174,6 +225,29 @@ export function DrinkPOS({ initialDrinks, onAdd, onClose }: DrinkPOSProps) {
                 >
                   Back to items
                 </button>
+              </div>
+            ) : isQuickServe ? (
+              <div>
+                <p className="mb-4 text-sm text-gray-500 dark:text-gray-400">
+                  One tap adds the set to the cart. You can still edit quantities below.
+                </p>
+                <div className="mx-auto grid max-w-2xl gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {DRINK_PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => handlePresetTap(preset)}
+                      className="flex min-h-28 flex-col items-start justify-center rounded-2xl border-2 border-amber-300/60 bg-amber-50 px-4 py-4 text-left shadow-sm active:bg-amber-100 dark:border-amber-600/40 dark:bg-amber-900/20 dark:active:bg-amber-900/40"
+                    >
+                      <span className="text-base font-bold text-navy dark:text-amber-200">
+                        {preset.label}
+                      </span>
+                      <span className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                        {preset.description}
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="mx-auto grid max-w-2xl gap-3 sm:grid-cols-2 lg:grid-cols-3">

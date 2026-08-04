@@ -152,6 +152,14 @@ export function OrderCard({ order, selected, onSelect, onStatusChange }: OrderCa
           {!hasMeal && !hasAperitif && !hasDrinks && (
             <p className="text-base text-gray-400 dark:text-gray-500">Nothing selected yet</p>
           )}
+          {order.notes.trim() && (
+            <div className="rounded-xl bg-amber-50 px-3 py-2 dark:bg-amber-900/20">
+              <p className="mb-0.5 text-xs font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-400">
+                Comment
+              </p>
+              <p className="text-sm text-gray-800 dark:text-gray-200">{order.notes.trim()}</p>
+            </div>
+          )}
         </div>
       </button>
 
