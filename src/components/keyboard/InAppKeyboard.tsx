@@ -55,13 +55,14 @@ const SYMBOL_ROW2 = ['-', '/', ':', ';', '(', ')', '$', '&', '@', '"', '.', ',',
 const SYMBOL_ROW3 = ["'", '`', '~', '<', '>', '€', '£', '¥', '•', '…', '!', '¡'];
 const SYMBOL_ROW4 = ['¿', '°', '±', '§', '¶', '©', '®', '™', '✓', '×', '÷', '∞'];
 
-const KEY_H = 'h-[52px] sm:h-[58px]';
-const KEY_GAP = 'gap-[6px]';
+const KEY_H = 'h-[60px] min-[768px]:h-[70px]';
+const KEY_GAP = 'gap-[7px] min-[768px]:gap-[8px]';
 const KEY_BG = 'bg-[#3a3a3c]';
 const MOD_BG = 'bg-[#2c2c2e]';
-const KEY_RADIUS = 'rounded-[8px]';
+const KEY_RADIUS = 'rounded-[10px]';
 const KEY_ACTIVE = 'active:bg-[#636366]';
 const PANEL_BG = 'bg-[#1c1c1e]';
+const ROW_MB = 'mb-2 min-[768px]:mb-2.5';
 
 export function InAppKeyboard({ value, onChange, onClose }: InAppKeyboardProps) {
   const [shift, setShift] = useState(false);
@@ -155,14 +156,14 @@ export function InAppKeyboard({ value, onChange, onClose }: InAppKeyboardProps) 
     <div className="fixed inset-x-0 bottom-0 z-[140] pointer-events-none">
       <div
         ref={panelRef}
-        className={`pointer-events-auto ${PANEL_BG} px-2 pt-1.5 pb-[max(8px,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.45)]`}
+        className={`pointer-events-auto ${PANEL_BG} px-2.5 pt-2 pb-[max(10px,env(safe-area-inset-bottom))] shadow-[0_-8px_24px_rgba(0,0,0,0.45)] min-[768px]:px-3`}
       >
         <Toolbar onUndo={undo} onRedo={redo} />
 
         {mode === 'letters' ? (
           <>
             {/* Row 1 — numbers */}
-            <div className={`mb-1.5 flex ${KEY_GAP}`}>
+            <div className={`${ROW_MB} flex ${KEY_GAP}`}>
               {ROW1.map((d) => (
                 <DualKey key={d.join()} dual={d} shift={upper} onTap={() => dual(d)} className="flex-1" />
               ))}
@@ -172,7 +173,7 @@ export function InAppKeyboard({ value, onChange, onClose }: InAppKeyboardProps) 
             </div>
 
             {/* Row 2 — qwerty + brackets */}
-            <div className={`mb-1.5 flex ${KEY_GAP}`}>
+            <div className={`${ROW_MB} flex ${KEY_GAP}`}>
               <ModKey onTap={() => add('\t')} className="w-[6.5%] shrink-0" ariaLabel="Tab">
                 <TabIcon />
               </ModKey>
@@ -185,7 +186,7 @@ export function InAppKeyboard({ value, onChange, onClose }: InAppKeyboardProps) 
             </div>
 
             {/* Row 3 — asdf + return */}
-            <div className={`mb-1.5 flex ${KEY_GAP}`}>
+            <div className={`${ROW_MB} flex ${KEY_GAP}`}>
               <ModKey
                 onTap={() => {
                   setCaps((c) => !c);
@@ -208,7 +209,7 @@ export function InAppKeyboard({ value, onChange, onClose }: InAppKeyboardProps) 
             </div>
 
             {/* Row 4 — zxcv + shifts */}
-            <div className={`mb-1.5 flex ${KEY_GAP}`}>
+            <div className={`${ROW_MB} flex ${KEY_GAP}`}>
               <ModKey
                 onTap={() => setShift((s) => !s)}
                 className={`w-[7%] shrink-0 ${shift && !caps ? 'bg-[#5a7bb8] text-white' : ''}`}
@@ -234,7 +235,7 @@ export function InAppKeyboard({ value, onChange, onClose }: InAppKeyboardProps) 
           </>
         ) : (
           <>
-            <div className={`mb-1.5 flex ${KEY_GAP}`}>
+            <div className={`${ROW_MB} flex ${KEY_GAP}`}>
               {SYMBOL_ROW1.map((ch) => (
                 <LetterKey key={ch} label={ch} onTap={() => add(ch)} />
               ))}
@@ -242,12 +243,12 @@ export function InAppKeyboard({ value, onChange, onClose }: InAppKeyboardProps) 
                 <BackspaceIcon />
               </ModKey>
             </div>
-            <div className={`mb-1.5 flex ${KEY_GAP}`}>
+            <div className={`${ROW_MB} flex ${KEY_GAP}`}>
               {SYMBOL_ROW2.map((ch) => (
                 <LetterKey key={ch} label={ch} onTap={() => add(ch)} />
               ))}
             </div>
-            <div className={`mb-1.5 flex ${KEY_GAP}`}>
+            <div className={`${ROW_MB} flex ${KEY_GAP}`}>
               {SYMBOL_ROW3.map((ch) => (
                 <LetterKey key={ch} label={ch} onTap={() => add(ch)} />
               ))}
@@ -255,7 +256,7 @@ export function InAppKeyboard({ value, onChange, onClose }: InAppKeyboardProps) 
                 <ReturnIcon />
               </ModKey>
             </div>
-            <div className={`mb-1.5 flex ${KEY_GAP}`}>
+            <div className={`${ROW_MB} flex ${KEY_GAP}`}>
               {SYMBOL_ROW4.map((ch) => (
                 <LetterKey key={ch} label={ch} onTap={() => add(ch)} />
               ))}
@@ -263,27 +264,24 @@ export function InAppKeyboard({ value, onChange, onClose }: InAppKeyboardProps) 
           </>
         )}
 
-        {/* Row 5 — bottom controls */}
+        {/* Row 5 — bottom controls (no emoji) */}
         <div className={`flex ${KEY_GAP}`}>
-          <ModKey onTap={() => add('🙂')} className="w-[7%] shrink-0 text-xl" ariaLabel="Emoji">
-            🙂
-          </ModKey>
-          <ModKey onTap={toggleMode} className="w-[10%] shrink-0 text-[13px] font-semibold tracking-tight" ariaLabel="Numbers">
+          <ModKey onTap={toggleMode} className="w-[12%] shrink-0 text-[14px] min-[768px]:text-[15px] font-semibold tracking-tight" ariaLabel="Numbers">
             {mode === 'letters' ? '.?123' : 'ABC'}
           </ModKey>
-          <ModKey onTap={() => undefined} className="w-[7%] shrink-0" ariaLabel="Microphone">
+          <ModKey onTap={() => undefined} className="w-[8%] shrink-0" ariaLabel="Microphone">
             <MicIcon />
           </ModKey>
           <button
             type="button"
             onClick={() => add(' ')}
-            className={`${KEY_H} flex-1 ${KEY_RADIUS} ${KEY_BG} ${KEY_ACTIVE} text-[13px] font-medium text-white/80`}
+            className={`${KEY_H} flex-1 ${KEY_RADIUS} ${KEY_BG} ${KEY_ACTIVE} text-[14px] font-medium text-white/80`}
             aria-label="Space"
           />
-          <ModKey onTap={toggleMode} className="w-[10%] shrink-0 text-[13px] font-semibold tracking-tight" ariaLabel="Numbers">
+          <ModKey onTap={toggleMode} className="w-[12%] shrink-0 text-[14px] min-[768px]:text-[15px] font-semibold tracking-tight" ariaLabel="Numbers">
             {mode === 'letters' ? '.?123' : 'ABC'}
           </ModKey>
-          <ModKey onTap={onClose} className="w-[8%] shrink-0" ariaLabel="Hide keyboard">
+          <ModKey onTap={onClose} className="w-[9%] shrink-0" ariaLabel="Hide keyboard">
             <HideKeyboardIcon />
           </ModKey>
         </div>
@@ -297,7 +295,7 @@ function LetterKey({ label, onTap }: { label: string; onTap: () => void }) {
     <button
       type="button"
       onClick={onTap}
-      className={`${KEY_H} flex-1 ${KEY_RADIUS} ${KEY_BG} ${KEY_ACTIVE} text-[26px] font-normal leading-none text-white`}
+      className={`${KEY_H} flex-1 ${KEY_RADIUS} ${KEY_BG} ${KEY_ACTIVE} text-[28px] min-[768px]:text-[32px] font-normal leading-none text-white`}
     >
       {label}
     </button>
@@ -323,8 +321,10 @@ function DualKey({
       onClick={onTap}
       className={`${KEY_H} ${KEY_RADIUS} ${KEY_BG} ${KEY_ACTIVE} relative px-0.5 ${className ?? ''}`}
     >
-      <span className="absolute left-1.5 top-1 text-[10px] leading-none text-white/45">{secondary}</span>
-      <span className="flex h-full items-center justify-center text-[22px] font-normal leading-none text-white">
+      <span className="absolute left-1.5 top-1.5 text-[11px] min-[768px]:text-[12px] leading-none text-white/45">
+        {secondary}
+      </span>
+      <span className="flex h-full items-center justify-center text-[24px] min-[768px]:text-[28px] font-normal leading-none text-white">
         {primary}
       </span>
     </button>
@@ -356,7 +356,7 @@ function ModKey({
 
 function Toolbar({ onUndo, onRedo }: { onUndo: () => void; onRedo: () => void }) {
   return (
-    <div className="mb-1.5 flex h-8 items-center justify-between px-1 text-white/70">
+    <div className="mb-2 flex h-9 min-[768px]:h-10 items-center justify-between px-1 text-white/70">
       <div className="flex items-center gap-4">
         <ToolbarBtn ariaLabel="Left" onTap={() => undefined}>
           <ChevronLeftIcon />
