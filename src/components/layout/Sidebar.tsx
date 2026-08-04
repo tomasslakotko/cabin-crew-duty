@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
+import { closeDayAndLock } from '../../lib/closeDay';
 
 const navItems = [
   { to: '/', label: 'Seat Map', icon: SeatIcon },
@@ -10,6 +12,19 @@ const navItems = [
 ];
 
 export function Sidebar() {
+  const [closingDay, setClosingDay] = useState(false);
+
+  const handleCloseDay = async () => {
+    const ok = window.confirm('Close day and clear all flights/orders? This cannot be undone.');
+    if (!ok) return;
+    try {
+      setClosingDay(true);
+      await closeDayAndLock();
+    } finally {
+      setClosingDay(false);
+    }
+  };
+
   return (
     <aside className="flex w-[88px] shrink-0 flex-col items-center gap-2 border-r border-gray-200 bg-white py-4 safe-area-left landscape:py-3 dark:border-gray-700 dark:bg-gray-900">
       <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-navy text-sm font-bold text-white">
@@ -32,6 +47,16 @@ export function Sidebar() {
           <span className="leading-tight">{label}</span>
         </NavLink>
       ))}
+      <button
+        type="button"
+        onClick={handleCloseDay}
+        disabled={closingDay}
+        className="mt-auto flex min-h-[72px] w-[72px] flex-col items-center justify-center gap-1 rounded-2xl border border-red-200 bg-red-50 px-2 text-center text-[11px] font-semibold text-red-700 transition-colors hover:bg-red-100 disabled:opacity-60 dark:border-red-900/60 dark:bg-red-900/20 dark:text-red-300 dark:hover:bg-red-900/30"
+        title="Close day"
+      >
+        <CloseDayIcon className="h-6 w-6" />
+        <span className="leading-tight">{closingDay ? 'Closing…' : 'Close Day'}</span>
+      </button>
     </aside>
   );
 }
@@ -87,6 +112,16 @@ function SettingsIcon({ className }: { className?: string }) {
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
       <circle cx="12" cy="12" r="3" />
       <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+    </svg>
+  );
+}
+
+function CloseDayIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M10 5H6a2 2 0 00-2 2v10a2 2 0 002 2h4" />
+      <path d="M14 16l4-4-4-4" />
+      <path d="M9 12h9" />
     </svg>
   );
 }
