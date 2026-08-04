@@ -1,5 +1,6 @@
 import type { MealStock } from '../../types';
 import type { StockableMealOption } from '../../data/bandMenus';
+import { KeyboardTextField } from '../keyboard/InAppKeyboard';
 
 interface MealStockFormProps {
   stock: MealStock;
@@ -66,12 +67,12 @@ export function MealStockForm({
               )}
             </select>
           ) : (
-            <input
-              type="text"
+            <KeyboardTextField
               value={stock.name}
-              onChange={(e) => onChange({ ...stock, name: e.target.value })}
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-lg font-medium text-navy outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 dark:border-gray-600 dark:bg-gray-900 dark:text-blue-300"
+              onChange={(name) => onChange({ ...stock, name })}
               placeholder="Meal name"
+              title={`Meal ${stock.sortOrder + 1} name`}
+              className="w-full min-h-[56px] rounded-xl border border-gray-200 px-4 py-3 text-left text-lg font-medium text-navy outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 dark:border-gray-600 dark:bg-gray-900 dark:text-blue-300"
             />
           )}
           {usePicker && stock.name && (

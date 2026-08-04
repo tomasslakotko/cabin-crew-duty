@@ -47,6 +47,12 @@ body {
   padding-right: env(safe-area-inset-right);
 }
 
+/* When in-app keyboard is open, keep focused UI above it */
+.keyboard-open .keyboard-avoid {
+  padding-bottom: var(--keyboard-inset, 0px);
+  transition: padding-bottom 0.2s ease-out;
+}
+
 @keyframes pin-shake {
   0%,
   100% {

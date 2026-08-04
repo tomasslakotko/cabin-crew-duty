@@ -4,11 +4,13 @@ import { beginDrinkRound } from '../../lib/orderServing';
 import { AperitifServiceGuide } from '../flight/AperitifServiceGuide';
 import { showAperitifServiceGuide } from '../../data/aperitifServiceGuide';
 import { useFlightStore } from '../../stores/flightStore';
+import { useKeyboardStore } from '../../stores/keyboardStore';
 import { aperitifGuidance } from '../../data/flightBands';
 import { AperitifPicker } from '../drinks/AperitifPicker';
 import { DrinkLineRow } from '../drinks/DrinkLineRow';
 import { DrinkPOS } from '../drinks/DrinkPOS';
 import { WinePairingHint } from '../meals/WinePairingHint';
+import { KeyboardTextField } from '../keyboard/InAppKeyboard';
 
 interface SeatSheetProps {
   seatId: string;
@@ -199,12 +201,13 @@ export function SeatSheet({
         <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
           Comment
         </label>
-        <textarea
+        <KeyboardTextField
           value={order.notes}
-          onChange={(e) => setOrder((prev) => ({ ...prev, notes: e.target.value }))}
-          placeholder="Allergies, preferences, special request…"
+          onChange={(notes) => setOrder((prev) => ({ ...prev, notes }))}
+          placeholder="Allergies, preferences, special request..."
+          title="Order comment"
           rows={2}
-          className="mb-6 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-base outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+          className="mb-6 w-full min-h-[84px] rounded-xl border border-gray-200 px-4 py-3 text-left text-base outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
         />
 
         <button
@@ -224,12 +227,12 @@ export function SeatSheet({
       <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
         Passenger name
       </label>
-      <input
-        type="text"
+      <KeyboardTextField
         value={order.passengerName}
-        onChange={(e) => setOrder((prev) => ({ ...prev, passengerName: e.target.value }))}
+        onChange={(passengerName) => setOrder((prev) => ({ ...prev, passengerName }))}
         placeholder="e.g. Brown, Leatham"
-        className="mb-6 w-full rounded-xl border border-gray-200 px-4 py-3 text-base outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+        title="Passenger name"
+        className="mb-6 w-full min-h-[52px] rounded-xl border border-gray-200 px-4 py-3 text-left text-base outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
       />
 
       {showAperitif && (
@@ -315,12 +318,13 @@ export function SeatSheet({
       <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-500">
         Comment
       </label>
-      <textarea
+      <KeyboardTextField
         value={order.notes}
-        onChange={(e) => setOrder((prev) => ({ ...prev, notes: e.target.value }))}
-        placeholder="Allergies, preferences, special request…"
+        onChange={(notes) => setOrder((prev) => ({ ...prev, notes }))}
+        placeholder="Allergies, preferences, special request..."
+        title="Order comment"
         rows={3}
-        className="mb-6 w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-base outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+        className="mb-6 w-full min-h-[112px] rounded-xl border border-gray-200 px-4 py-3 text-left text-base outline-none focus:border-navy focus:ring-2 focus:ring-navy/20 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
       />
 
       <button
@@ -346,6 +350,7 @@ function SheetChrome({
   children: ReactNode;
 }) {
   const isPanel = layout === 'panel';
+  const keyboardHeight = useKeyboardStore((s) => s.height);
 
   return (
     <>
@@ -354,8 +359,9 @@ function SheetChrome({
         className={
           isPanel
             ? 'flex h-full min-h-0 flex-col overflow-y-auto bg-white dark:bg-gray-900'
-            : 'fixed inset-x-0 bottom-0 z-40 max-h-[85vh] overflow-y-auto rounded-t-3xl bg-white shadow-2xl safe-area-bottom dark:bg-gray-900'
+            : 'fixed inset-x-0 z-40 max-h-[85vh] overflow-y-auto rounded-t-3xl bg-white shadow-2xl safe-area-bottom transition-[bottom] duration-200 ease-out dark:bg-gray-900'
         }
+        style={!isPanel ? { bottom: keyboardHeight } : undefined}
       >
         {!isPanel && <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-gray-300" />}
         <div className={`p-6 ${isPanel ? 'flex-1' : ''}`}>

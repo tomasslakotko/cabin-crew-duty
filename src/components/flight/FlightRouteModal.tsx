@@ -11,6 +11,8 @@ import {
   type FlightBand,
   searchAirports,
 } from '../../data/flightBands';
+import { KeyboardTextField } from '../keyboard/InAppKeyboard';
+import { useKeyboardStore } from '../../stores/keyboardStore';
 
 type PickerField = 'origin' | 'destination';
 
@@ -34,6 +36,7 @@ export function FlightRouteModal({
   );
   const [query, setQuery] = useState('');
   const [bandFilter, setBandFilter] = useState<FlightBand | 'all'>('all');
+  const keyboardHeight = useKeyboardStore((s) => s.height);
 
   const routeValid = isValidRoute(origin, destination);
 
@@ -83,10 +86,22 @@ export function FlightRouteModal({
     onConfirm(origin, destination);
   }
 
+  const keyboardOpen = keyboardHeight > 0;
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/50 p-4 sm:items-center">
+    <div
+      className={`fixed inset-0 z-[100] flex justify-center bg-black/50 p-4 transition-[padding-bottom] duration-200 ease-out ${
+        keyboardOpen ? 'items-start pt-3' : 'items-end sm:items-center'
+      }`}
+      style={{ paddingBottom: keyboardOpen ? keyboardHeight + 8 : undefined }}
+    >
       <div
-        className="flex max-h-[90vh] w-full max-w-lg flex-col rounded-2xl bg-white shadow-xl dark:bg-gray-800"
+        className="flex w-full max-w-lg flex-col rounded-2xl bg-white shadow-xl dark:bg-gray-800"
+        style={{
+          maxHeight: keyboardOpen
+            ? `calc(100dvh - ${keyboardHeight + 24}px)`
+            : '90vh',
+        }}
         role="dialog"
         aria-modal="true"
         aria-labelledby="route-title"
@@ -146,13 +161,12 @@ export function FlightRouteModal({
             </p>
           )}
 
-          <input
-            type="search"
+          <KeyboardTextField
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder={`Search ${activeField === 'origin' ? 'origin' : 'destination'}…`}
-            className="mt-4 w-full min-h-12 rounded-xl border border-gray-200 bg-gray-50 px-4 text-base dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
-            autoFocus
+            onChange={setQuery}
+            placeholder={`Search ${activeField === 'origin' ? 'origin' : 'destination'}...`}
+            title="Route search"
+            className="mt-4 w-full min-h-12 rounded-xl border border-gray-200 bg-gray-50 px-4 text-left text-base dark:border-gray-600 dark:bg-gray-900 dark:text-gray-100"
           />
           <div className="mt-3 flex flex-wrap gap-2">
             {(['all', 1, 2, 3] as const).map((b) => (

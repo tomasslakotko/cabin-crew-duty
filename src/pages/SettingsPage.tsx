@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { PageHeader } from '../components/layout/PageHeader';
 import { FlightRouteModal } from '../components/flight/FlightRouteModal';
 import { FlightRouteLabel, hasCompleteRoute } from '../components/flight/FlightRouteLabel';
+import { KeyboardTextField } from '../components/keyboard/InAppKeyboard';
 import { BAND_LABELS, formatRouteCodes } from '../data/flightBands';
 import { useFlightStore } from '../stores/flightStore';
 import { useOrderStore } from '../stores/orderStore';
@@ -332,13 +333,13 @@ function FlightNumberField() {
   if (!flight) return null;
 
   return (
-    <input
-      type="text"
+    <KeyboardTextField
       value={value}
-      onChange={(e) => setValue(e.target.value)}
-      onBlur={() => void setFlightNumber(value)}
+      onChange={setValue}
+      onCommit={() => void setFlightNumber(value)}
       placeholder="e.g. JU 501"
-      className="mt-2 w-full rounded-xl border border-gray-200 px-4 py-3 text-base outline-none focus:border-navy dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+      title="Flight number"
+      className="mt-2 w-full min-h-[52px] rounded-xl border border-gray-200 px-4 py-3 text-left text-base outline-none focus:border-navy dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
     />
   );
 }

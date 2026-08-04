@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { FlightRouteLabel, hasCompleteRoute } from './FlightRouteLabel';
 import { useFlightStore } from '../../stores/flightStore';
+import { KeyboardTextField } from '../keyboard/InAppKeyboard';
 
 export function FlightSwitcher() {
   const flights = useFlightStore((s) => s.flights);
@@ -101,12 +102,12 @@ export function FlightSwitcher() {
             <div className="mt-3 border-t border-gray-100 pt-3 dark:border-gray-700">
               <p className="mb-2 px-1 text-xs font-semibold text-gray-500">New leg</p>
               <div className="flex gap-2">
-                <input
-                  type="text"
+                <KeyboardTextField
                   value={newNumber}
-                  onChange={(e) => setNewNumber(e.target.value)}
+                  onChange={setNewNumber}
                   placeholder="Flight no. (optional)"
-                  className="min-h-10 flex-1 rounded-xl border border-gray-200 px-3 text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
+                  title="New leg flight number"
+                  className="min-h-10 flex-1 rounded-xl border border-gray-200 px-3 text-left text-sm dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100"
                 />
                 <button
                   type="button"
